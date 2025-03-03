@@ -4,8 +4,4 @@ function Home() {
   );
 }
 
-function teste() {
-  console.log("OPA!!!!!");
-}
-
 export default Home;
