@@ -3,20 +3,13 @@ test("GET to /api/v1/status shoudl return 200", async () => {
   expect(response.status).toBe(200);
 
   const responseBody = await response.json();
-  expect(responseBody.updated_at).toBeDefined();
 
   const parsedUpdatedAt = new Date(responseBody.updated_at).toISOString();
   expect(responseBody.updated_at).toEqual(parsedUpdatedAt);
 
-  expect(responseBody.postgres_version).toBeDefined();
-  expect(typeof responseBody.postgres_version).toEqual("string");
-
-  expect(responseBody.max_connections).toBeDefined();
-  const maxConnectionsNumber = Number(responseBody.max_connections);
-  expect(String(maxConnectionsNumber)).toEqual(responseBody.max_connections);
-
-  expect(responseBody.connections).toBeDefined();
-  expect(typeof responseBody.connections).toEqual("number");
+  expect(responseBody.dependencies.database.version).toEqual("16.0");
+  expect(responseBody.dependencies.database.max_connections).toEqual(100);
+  expect(responseBody.dependencies.database.connections).toEqual(1);
 
   console.log(responseBody);
 });
