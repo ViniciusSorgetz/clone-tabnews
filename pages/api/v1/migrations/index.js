@@ -23,7 +23,7 @@ async function getHandler(req, res) {
     });
     return res.status(200).json(pandingMigrations);
   } finally {
-    await dbClient.end();
+    await dbClient?.end();
   }
 }
 
@@ -44,7 +44,7 @@ async function postHandler(req, res) {
     }
     return res.status(200).json(migratedMigrations);
   } finally {
-    await dbClient.end();
+    await dbClient?.end();
   }
 }
 
