@@ -3,6 +3,7 @@ import {
   InternalServerError,
   ValidationError,
   ServiceError,
+  NotFoundError,
 } from "infra/errors";
 
 function onNoMatchHandler(req, res) {
@@ -12,10 +13,17 @@ function onNoMatchHandler(req, res) {
 
 function onErrorHandler(error, req, res) {
   if (error instanceof ValidationError) {
+    console.error(error);
     return res.status(error.statusCode).json(error);
   }
 
   if (error instanceof ServiceError) {
+    console.error(error);
+    return res.status(error.statusCode).json(error);
+  }
+
+  if (error instanceof NotFoundError) {
+    console.error(error);
     return res.status(error.statusCode).json(error);
   }
 
