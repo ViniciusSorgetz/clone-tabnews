@@ -1,4 +1,5 @@
 import database from "infra/database";
+import passwordModel from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors";
 
 async function create({ username, email, password }) {
@@ -6,8 +7,11 @@ async function create({ username, email, password }) {
   await validateUniqueField("email", email);
   // username validation
   await validateUniqueField("username", username);
+  // password creation
 
-  const newUser = await runInsertQuery(username, email, password);
+  const hashedPassword = await hashPassowrdInObject(password);
+
+  const newUser = await runInsertQuery(username, email, hashedPassword);
   return newUser;
 
   async function validateUniqueField(field, email) {
@@ -29,6 +33,10 @@ async function create({ username, email, password }) {
         action: `Utilize outro ${field} para realizar o cadastro`,
       });
     }
+  }
+
+  async function hashPassowrdInObject(password) {
+    return await passwordModel.hash(password);
   }
 
   async function runInsertQuery(username, email, password) {
