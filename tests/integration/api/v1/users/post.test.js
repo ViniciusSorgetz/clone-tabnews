@@ -88,8 +88,8 @@ describe("POST /api/v1/users", () => {
 
       expect(response2Body).toEqual({
         name: "ValidationError",
-        message: `O email Rexemail@curso.dev já está sendo utilizado`,
-        action: "Utilize outro email para realizar o cadastro",
+        message: `O email Rexemail@curso.dev já está sendo utilizado.`,
+        action: "Utilize outro email para realizar esta operação.",
         status_code: 400,
       });
     });
@@ -127,8 +127,8 @@ describe("POST /api/v1/users", () => {
 
       expect(response2Body).toEqual({
         name: "ValidationError",
-        message: `O username littleRex já está sendo utilizado`,
-        action: "Utilize outro username para realizar o cadastro",
+        message: `O username littleRex já está sendo utilizado.`,
+        action: "Utilize outro username para realizar esta operação.",
         status_code: 400,
       });
     });
