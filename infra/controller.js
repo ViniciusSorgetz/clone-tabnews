@@ -4,6 +4,7 @@ import {
   ValidationError,
   ServiceError,
   NotFoundError,
+  UnauthorizedError,
 } from "infra/errors";
 
 function onNoMatchHandler(req, res) {
@@ -12,27 +13,20 @@ function onNoMatchHandler(req, res) {
 }
 
 function onErrorHandler(error, req, res) {
-  if (error instanceof ValidationError) {
-    console.error(error);
-    return res.status(error.statusCode).json(error);
-  }
-
-  if (error instanceof ServiceError) {
-    console.error(error);
-    return res.status(error.statusCode).json(error);
-  }
-
-  if (error instanceof NotFoundError) {
+  if (
+    error instanceof ValidationError ||
+    error instanceof ServiceError ||
+    error instanceof NotFoundError ||
+    error instanceof UnauthorizedError
+  ) {
     console.error(error);
     return res.status(error.statusCode).json(error);
   }
 
   const publicErrorObject = new InternalServerError({
-    statusCode: error.statusCode,
     cause: error,
   });
 
-  console.log("\n Erro dentro do catch do next-connect");
   console.error(publicErrorObject);
 
   res.status(publicErrorObject.statusCode).json(publicErrorObject);
