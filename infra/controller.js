@@ -19,10 +19,15 @@ function onErrorHandler(error, req, res) {
   if (
     error instanceof ValidationError ||
     error instanceof ServiceError ||
-    error instanceof NotFoundError ||
-    error instanceof UnauthorizedError
+    error instanceof NotFoundError
   ) {
-    console.error(error);
+    return res.status(error.statusCode).json(error);
+  }
+
+  if (error instanceof UnauthorizedError) {
+    if (req.cookies.session_id) {
+      clearSessionCookie(res);
+    }
     return res.status(error.statusCode).json(error);
   }
 
@@ -31,8 +36,7 @@ function onErrorHandler(error, req, res) {
   });
 
   console.error(publicErrorObject);
-
-  res.status(publicErrorObject.statusCode).json(publicErrorObject);
+  return res.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
 function setSessionCookie(sessionToken, res) {
