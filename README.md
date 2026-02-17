@@ -1,14 +1,14 @@
 # clone-tabnews
 
-### Projeto feito pelo https://curso.dev para treinar programação e me sentir um programar genuinamente competente
+### Project made with https://curso.dev to train programming and feel confident as a developer
 
 <br>
 
-## 🚀 Principais Tecnologias e Ferramentas
+## 🚀 Main Tecnologies and Tools
 
 - JavaScript
 - Next
-- Git, GitHub e GitHub Actions
+- Git, GitHub and GitHub Actions
 - Jest
 - Docker
 - Postgres
@@ -16,14 +16,14 @@
 - Prettier
 - Husky hook
 
-## Competências
+## Skills
 
-- Implementação de CI/CD
-- Testes automatizados
-- Organização por Milestones e Issues
-- Barreira com testes para autorizar um pull request
-- Controle de formatação e qualidade de código
-- Sistema próprio de cadastro de usuário com encriptação de senhas
-- Sem ORM (SQL escrito na mão)
-- Arquitetura MVC
+- CI/CD implementation
+- Automated tests
+- Organization with Milestones and Issues
+- Tests success requirement to autorize a pull request
+- Control over formatting and code quality
+- User registration system with password encryption
+- Without ORM (SQL written by hand)
+- MVC architecture
 - Error Handling
