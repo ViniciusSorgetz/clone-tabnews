@@ -24,7 +24,7 @@ async function getNewClient() {
     port: process.env.POSTGRES_PORT,
     user: process.env.POSTGRES_USER,
     database: process.env.POSTGRES_DB,
-    password: process.env.POSTGRES_password,
+    password: process.env.POSTGRES_PASSWORD,
     ssl: getSSLValues(),
   });
 

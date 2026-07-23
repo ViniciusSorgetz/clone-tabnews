@@ -134,9 +134,6 @@ describe("GET /api/v1/user", () => {
       renewedUpdatedAt.setMilliseconds(0);
       oldUpdatedAt.setMilliseconds(0);
 
-      console.log(renewedUpdatedAt);
-      console.log(oldUpdatedAt);
-
       expect(renewedUpdatedAt - oldUpdatedAt).toEqual(
         session.EXPIRATION_IN_MILISECONDS / 2,
       );
