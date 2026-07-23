@@ -3,28 +3,29 @@ import passwordModel from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors";
 
 async function create({ username, email, password }) {
-  // username validation
   await validateUniqueField("username", username);
-  // email validation
   await validateUniqueField("email", email);
-
-  // password creation
   const hashedPassword = await hashPassowrdInObject(password);
-
-  const newUser = await runInsertQuery(username, email, hashedPassword);
+  const defaultFeatures = ["read:activation_token"];
+  const newUser = await runInsertQuery(
+    username,
+    email,
+    hashedPassword,
+    defaultFeatures,
+  );
   return newUser;
 
-  async function runInsertQuery(username, email, password) {
+  async function runInsertQuery(username, email, password, features) {
     const results = await database.query({
       text: `
-          INSERT INTO 
-            users (username, email, password, created_at, updated_at) 
-          VALUES 
-            ($1, $2, $3, $4, $5)
+          INSERT INTO
+            users (username, email, password, features, created_at, updated_at)
+          VALUES
+            ($1, $2, $3, $4, $5, $6)
           RETURNING
             *
           ;`,
-      values: [username, email, password, new Date(), new Date()],
+      values: [username, email, password, features, new Date(), new Date()],
     });
     return results.rows[0];
   }
@@ -37,9 +38,9 @@ async function findOneById(userId) {
   async function runSelectQuery(id) {
     const results = await database.query({
       text: `
-          SELECT 
+          SELECT
             *
-          FROM 
+          FROM
             users
           WHERE
             id = $1
@@ -67,9 +68,9 @@ async function findOneByUsername(username) {
   async function runSelectQuery(username) {
     const results = await database.query({
       text: `
-          SELECT 
+          SELECT
             *
-          FROM 
+          FROM
             users
           WHERE
             LOWER(username) = LOWER($1)
@@ -97,9 +98,9 @@ async function findOneByEmail(email) {
   async function runSelectQuery(email) {
     const results = await database.query({
       text: `
-          SELECT 
+          SELECT
             *
-          FROM 
+          FROM
             users
           WHERE
             LOWER(email) = LOWER($1)
