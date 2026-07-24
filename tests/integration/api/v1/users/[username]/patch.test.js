@@ -50,6 +50,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       username: "uniqueUser2",
       email: "uniqueuser1@curso.dev",
       password: responseBody.password,
+      features: ["read:activation_token"],
       created_at: responseBody.created_at,
       updated_at: responseBody.updated_at,
     });
@@ -191,7 +192,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 
     test("With new password", async () => {
       const createdUser = await orchestrator.createUser({
-        password: "newPassword1",
+        password: "newpassword1",
       });
 
       const response = await fetch(
@@ -202,7 +203,7 @@ describe("PATCH /api/v1/users/[username]", () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            password: "newPassword2",
+            password: "newpassword2",
           }),
         },
       );
@@ -210,18 +211,18 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(response.status).toBe(200);
 
       const userInDatabase = await user.findOneByUsername(createdUser.username);
-      const correctPasswordMatch = await password.compare(
-        "newPassword2",
+      const correctpasswordMatch = await password.compare(
+        "newpassword2",
         userInDatabase.password,
       );
 
-      const incorrectPasswordMatch = await password.compare(
-        "newPassword1",
+      const incorrectpasswordMatch = await password.compare(
+        "newpassword1",
         userInDatabase.password,
       );
 
-      expect(correctPasswordMatch).toBe(true);
-      expect(incorrectPasswordMatch).toBe(false);
+      expect(correctpasswordMatch).toBe(true);
+      expect(incorrectpasswordMatch).toBe(false);
     });
   });
 });

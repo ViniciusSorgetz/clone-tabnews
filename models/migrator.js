@@ -43,6 +43,7 @@ async function runPendingMigrations() {
       dryRun: false,
       dbClient,
     });
+
     return pandingMigrations;
   } catch (error) {
     const serviceErrorObject = new ServiceError({

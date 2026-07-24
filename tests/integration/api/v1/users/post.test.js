@@ -32,6 +32,7 @@ describe("POST /api/v1/users", () => {
         username: "rex",
         email: "rex@curso.dev",
         password: responseBody.password,
+        features: ["read:activation_token"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -41,18 +42,18 @@ describe("POST /api/v1/users", () => {
       expect(typeof Date.parse(responseBody.updated_at)).not.toBe(NaN);
 
       const userInDatabase = await user.findOneByUsername("rex");
-      const correctPasswordMatch = await password.compare(
+      const correctpasswordMatch = await password.compare(
         "senha123",
         userInDatabase.password,
       );
 
-      const incorrectPasswordMatch = await password.compare(
+      const incorrectpasswordMatch = await password.compare(
         "senha Incorreta!",
         userInDatabase.password,
       );
 
-      expect(correctPasswordMatch).toBe(true);
-      expect(incorrectPasswordMatch).toBe(false);
+      expect(correctpasswordMatch).toBe(true);
+      expect(incorrectpasswordMatch).toBe(false);
     });
 
     test("With duplicated email", async () => {
