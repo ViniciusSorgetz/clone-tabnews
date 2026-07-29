@@ -1,5 +1,6 @@
 import database from "infra/database";
 import email from "infra/email";
+import { NotFoundError, ValidationError } from "infra/errors";
 import webserver from "infra/webserver";
 
 const EXPIRATION_IN_MILLISECONDS = 1000 * 60 * 15; // 15 minutes
@@ -42,12 +43,13 @@ atensiosamente, equipe do Treenews.
   });
 }
 
-async function findOneByUserId(userId) {
-  const activationToken = await runSelectQuery(userId);
+async function findValidTokenById(token) {
+  const activationToken = await runSelectQuery(token);
+  validateToken(activationToken);
 
   return activationToken;
 
-  async function runSelectQuery(userId) {
+  async function runSelectQuery(token) {
     const results = await database.query({
       text: `
         SELECT
@@ -55,21 +57,44 @@ async function findOneByUserId(userId) {
         FROM
           user_activation_tokens
         WHERE
-          user_id = $1
+          id = $1
         LIMIT
           1
         ;`,
-      values: [userId],
+      values: [token],
     });
 
+    if (results.rowCount === 0) {
+      throw new NotFoundError({
+        message: `Token não encontrado.`,
+        action: `Verifique se o token está correto e tente novamente.`,
+      });
+    }
+
     return results.rows[0];
+  }
+
+  async function validateToken() {
+    if (activationToken.used_at) {
+      throw new ValidationError({
+        message: "O token já foi utilizado.",
+        action: "Tente utilizar outro token de ativação.",
+      });
+    }
+
+    if (activationToken.expiration_date < Date.now()) {
+      throw new ValidationError({
+        message: "O token já expirou.",
+        action: "Tente receber outro token de ativação.",
+      });
+    }
   }
 }
 
 const activation = {
   create,
   sendEmailToUser,
-  findOneByUserId,
+  findValidTokenById,
 };
 
 export default activation;

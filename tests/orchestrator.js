@@ -89,6 +89,19 @@ async function getLastEmail() {
   };
 }
 
+function getTokenFromEmail(email) {
+  const regex =
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}/g;
+  const result = email.match(regex);
+
+  if (result.length !== 1) {
+    throw Error();
+  }
+  console.log(result[0]);
+
+  return result[0];
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
@@ -97,6 +110,7 @@ const orchestrator = {
   createSession,
   deleteAllEmails,
   getLastEmail,
+  getTokenFromEmail,
 };
 
 export default orchestrator;
