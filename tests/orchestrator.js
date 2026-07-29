@@ -97,7 +97,6 @@ function getTokenFromEmail(email) {
   if (result.length !== 1) {
     throw Error();
   }
-  console.log(result[0]);
 
   return result[0];
 }

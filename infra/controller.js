@@ -16,6 +16,8 @@ function onNoMatchHandler(req, res) {
 }
 
 function onErrorHandler(error, req, res) {
+  // console.log(error);
+
   if (
     error instanceof ValidationError ||
     error instanceof ServiceError ||
