@@ -209,6 +209,8 @@ async function setFeaturesByUserId(userId, features) {
           features = $1
         WHERE
           id = $2
+        RETURNING
+          *
       ;`,
       values: [features, userId],
     });

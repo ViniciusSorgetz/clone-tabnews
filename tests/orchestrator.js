@@ -5,6 +5,7 @@ import database from "infra/database.js";
 import migrator from "models/migrator.js";
 import user from "models/user.js";
 import session from "models/session";
+import activation from "models/activation";
 
 const emailHttpUrl = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -49,14 +50,20 @@ async function runPendingMigrations() {
   await migrator.runPendingMigrations();
 }
 
-async function createUser({ username, email, password }) {
+async function createUser({ username, email, password, activated }) {
   const createdUser = await user.create({
     username: username || faker.internet.username().replace(/[_.-]/g, ""),
     email: email || faker.internet.email(),
     password: password || "validpassword",
   });
 
-  return createdUser;
+  if (!activated) {
+    return createdUser;
+  }
+
+  const activatedUser = await activation.activateUserByUserId(createdUser.id);
+
+  return activatedUser;
 }
 
 async function createSession(userId) {
