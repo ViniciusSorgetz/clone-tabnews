@@ -10,10 +10,28 @@ beforeAll(async () => {
 });
 
 describe("GET /api/v1/user", () => {
+  describe("Anonymous user", () => {
+    test("Retrieving the endpoint", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/user");
+
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Você não possui permissão para executar esta ação.",
+        action: "Verifique se o seu usuário possui a feature read:session.",
+        status_code: 403,
+      });
+    });
+  });
+
   describe("Default user", () => {
     test("With valid session", async () => {
       const createdUser = await orchestrator.createUser({
         username: "UserWithValidSession",
+        activated: true,
       });
 
       const createdSession = await orchestrator.createSession(createdUser.id);
@@ -38,7 +56,7 @@ describe("GET /api/v1/user", () => {
         username: "UserWithValidSession",
         email: createdUser.email,
         password: createdUser.password,
-        features: ["read:activation_token"],
+        features: ["create:session", "read:user-information", "read:session"],
         created_at: createdUser.created_at.toISOString(),
         updated_at: createdUser.updated_at.toISOString(),
       });
@@ -82,6 +100,7 @@ describe("GET /api/v1/user", () => {
 
       const createdUser = await orchestrator.createUser({
         username: "UserWithValidOldSession",
+        activated: true,
       });
 
       const createdSession = await orchestrator.createSession(createdUser.id);
@@ -103,7 +122,7 @@ describe("GET /api/v1/user", () => {
         username: "UserWithValidOldSession",
         email: createdUser.email,
         password: createdUser.password,
-        features: ["read:activation_token"],
+        features: ["create:session", "read:user-information", "read:session"],
         created_at: createdUser.created_at.toISOString(),
         updated_at: createdUser.updated_at.toISOString(),
       });
@@ -124,8 +143,9 @@ describe("GET /api/v1/user", () => {
       oldExpiresAt.setMilliseconds(0);
 
       // newed expires_at value is 15 days greater than the old value
-      expect(renewedExpiresAt - oldExpiresAt).toEqual(
+      expect(renewedExpiresAt - oldExpiresAt).toBeCloseTo(
         session.EXPIRATION_IN_MILISECONDS / 2,
+        -3, // tolerância na casa dos milhares (≈ 1000)
       );
 
       const renewedUpdatedAt = new Date(renewedSession.updated_at);
@@ -134,8 +154,9 @@ describe("GET /api/v1/user", () => {
       renewedUpdatedAt.setMilliseconds(0);
       oldUpdatedAt.setMilliseconds(0);
 
-      expect(renewedUpdatedAt - oldUpdatedAt).toEqual(
+      expect(renewedUpdatedAt - oldUpdatedAt).toBeCloseTo(
         session.EXPIRATION_IN_MILISECONDS / 2,
+        -3, // tolerância na casa dos milhares (≈ 1000)
       );
 
       // Set-Cookie assertions

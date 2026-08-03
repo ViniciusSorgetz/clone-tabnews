@@ -38,6 +38,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(typeof Date.parse(response2Body.created_at)).not.toBe(NaN);
       expect(typeof Date.parse(response2Body.updated_at)).not.toBe(NaN);
     });
+
     test("With case mismatch", async () => {
       await orchestrator.createUser({
         username: "CaseDiferente",
@@ -53,6 +54,8 @@ describe("GET /api/v1/users/[username]", () => {
 
       const response2Body = await response2.json();
 
+      console.log(response2Body);
+
       expect(response2Body).toEqual({
         id: response2Body.id,
         username: "CaseDiferente",
@@ -67,6 +70,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(typeof Date.parse(response2Body.created_at)).not.toBe(NaN);
       expect(typeof Date.parse(response2Body.updated_at)).not.toBe(NaN);
     });
+
     test("With non-existent user", async () => {
       const response = await fetch(
         "http://localhost:3000/api/v1/users/UsuarioNaoExistente",

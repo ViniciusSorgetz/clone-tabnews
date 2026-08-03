@@ -11,6 +11,7 @@ import {
   UnauthorizedError,
   ForbiddenError,
 } from "infra/errors";
+
 import user from "models/user";
 
 function onNoMatchHandler(req, res) {
@@ -41,7 +42,6 @@ function onErrorHandler(error, req, res) {
     cause: error,
   });
 
-  console.error(publicErrorObject);
   return res.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
@@ -89,7 +89,12 @@ async function injectAuthenticatedUser(req) {
 
 function injectAnonymousUser(req) {
   const anonymousUserObjeact = {
-    features: ["read:activation_token", "create:session", "create:user"],
+    features: [
+      "read:activation_token",
+      "read:user-information",
+      "create:session",
+      "create:user",
+    ],
   };
 
   req.context = {

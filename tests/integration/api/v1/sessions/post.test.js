@@ -14,6 +14,7 @@ describe("POST /api/v1/sessions", () => {
     test("With wrong `e-mail` and correct `password`", async () => {
       await orchestrator.createUser({
         password: "senha-correta",
+        activated: true,
       });
 
       const response = await fetch("http://localhost:3000/api/v1/sessions", {
@@ -31,6 +32,8 @@ describe("POST /api/v1/sessions", () => {
 
       const responseBody = await response.json();
 
+      console.log(responseBody);
+
       expect(responseBody).toEqual({
         name: "UnauthorizedError",
         message: "Dados de autenticação não conferem.",
@@ -42,6 +45,7 @@ describe("POST /api/v1/sessions", () => {
     test("With correct `e-mail` but incorrect `password`", async () => {
       await orchestrator.createUser({
         email: "email.correto@curso.dev",
+        activated: true,
       });
 
       const response = await fetch("http://localhost:3000/api/v1/sessions", {

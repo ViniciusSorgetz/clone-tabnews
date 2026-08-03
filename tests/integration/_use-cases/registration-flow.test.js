@@ -13,6 +13,7 @@ beforeAll(async () => {
 describe("Use case: Registration Flow (all successful)", () => {
   let createUserResponseBody;
   let extractedToken;
+  let sessionId;
 
   test("Create user account", async () => {
     const createUserResponse = await fetch(
@@ -78,7 +79,11 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(activateTokenResponseBody.used_at).toBeTruthy();
 
     const activatedUser = await user.findOneByUsername("RegistrationFlow");
-    expect(activatedUser.features).toEqual(["create:session"]);
+    expect(activatedUser.features).toEqual([
+      "create:session",
+      "read:user-information",
+      "read:session",
+    ]);
   });
 
   test("Login", async () => {
@@ -100,12 +105,29 @@ describe("Use case: Registration Flow (all successful)", () => {
 
     const createSessionResponseBody = await createSessionResponse.json();
 
+    sessionId = createSessionResponseBody.token;
+
     expect(createSessionResponseBody.user_id).toEqual(
       createUserResponseBody.id,
     );
   });
 
   test("Get user information", async () => {
-    expect(1 + 1).toBe(2);
+    const userInformationResponse = await fetch(
+      "http://localhost:3000/api/v1/user",
+      {
+        headers: {
+          cookie: `session_id=${sessionId}`,
+        },
+      },
+    );
+
+    expect(userInformationResponse.status).toBe(200);
+
+    const userInformationResponseBody = await userInformationResponse.json();
+
+    expect(userInformationResponseBody.email).toBe(
+      "registration.flow@curso.dev",
+    );
   });
 });
