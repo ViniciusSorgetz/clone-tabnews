@@ -32,8 +32,6 @@ describe("POST /api/v1/sessions", () => {
 
       const responseBody = await response.json();
 
-      console.log(responseBody);
-
       expect(responseBody).toEqual({
         name: "UnauthorizedError",
         message: "Dados de autenticação não conferem.",

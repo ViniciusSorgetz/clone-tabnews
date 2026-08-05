@@ -1,3 +1,4 @@
+import utils from "infra/utils";
 import webserver from "infra/webserver";
 import activation from "models/activation";
 import user from "models/user";
@@ -48,7 +49,7 @@ describe("Use case: Registration Flow (all successful)", () => {
   test("Receive activation email", async () => {
     const lastEmail = await orchestrator.getLastEmail();
 
-    extractedToken = await orchestrator.getTokenFromEmail(lastEmail.text);
+    extractedToken = await utils.extractUuid(lastEmail.text);
 
     expect(lastEmail.text).toContain(
       `${webserver.origin}/cadastro/ativar/${extractedToken}`,

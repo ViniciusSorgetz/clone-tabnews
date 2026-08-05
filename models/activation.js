@@ -1,8 +1,9 @@
 import database from "infra/database";
 import email from "infra/email";
-import { NotFoundError, ValidationError } from "infra/errors";
+import { ForbiddenError, NotFoundError, ValidationError } from "infra/errors";
 import webserver from "infra/webserver";
 import user from "./user";
+import utils from "infra/utils";
 
 const EXPIRATION_IN_MILLISECONDS = 1000 * 60 * 15; // 15 minutes
 
@@ -45,6 +46,7 @@ atensiosamente, equipe do Treenews.
 }
 
 async function findValidTokenById(token) {
+  checkTokenFormat(token);
   const activationToken = await runSelectQuery(token);
   validateToken(activationToken);
 
@@ -75,7 +77,16 @@ async function findValidTokenById(token) {
     return results.rows[0];
   }
 
-  async function validateToken() {
+  function checkTokenFormat(token) {
+    if (!utils.extractUuid(token)) {
+      throw new ValidationError({
+        message: "O token não atende ao formato necessário.",
+        action: "Tente utilizar outro token de ativação.",
+      });
+    }
+  }
+
+  function validateToken() {
     if (activationToken.used_at) {
       throw new ValidationError({
         message: "O token já foi utilizado.",
@@ -83,7 +94,7 @@ async function findValidTokenById(token) {
       });
     }
 
-    if (activationToken.expiration_date < Date.now()) {
+    if (new Date(activationToken.expires_at) < new Date()) {
       throw new ValidationError({
         message: "O token já expirou.",
         action: "Tente receber outro token de ativação.",
@@ -118,6 +129,15 @@ async function markTokenAsUsed(token) {
 }
 
 async function activateUserByUserId(userId) {
+  const userToActivate = await user.findOneById(userId);
+
+  if (!userToActivate.features.includes("read:activation_token")) {
+    throw new ForbiddenError({
+      message: "Você não pode mais utilizar tokens de ativação.",
+      action: "Entre em contato com o suporte se você acha que isso é um erro.",
+    });
+  }
+
   const activatedUser = await user.setFeaturesByUserId(userId, [
     "create:session",
     "read:user-information",
@@ -132,6 +152,7 @@ const activation = {
   findValidTokenById,
   markTokenAsUsed,
   activateUserByUserId,
+  EXPIRATION_IN_MILLISECONDS,
 };
 
 export default activation;

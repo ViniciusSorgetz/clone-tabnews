@@ -6,6 +6,7 @@ const EXPIRATION_IN_MILISECONDS = 1000 * 60 * 60 * 24 * 30; // 30 days
 
 async function findValidOneByToken(sessionToken) {
   const foundSession = await runSelectQuery(sessionToken);
+
   return foundSession;
 
   async function runSelectQuery(sessionToken) {
@@ -44,13 +45,13 @@ async function create(userId) {
   async function runInsertQuery(token, userId, expiresAt) {
     const result = await database.query({
       text: `
-        INSERT INTO
-          sessions (token, user_id, expires_at, created_at, updated_at)
-        VALUES
-          ($1, $2, $3, $4, $5)
-        RETURNING
-          *
-      ;`,
+          INSERT INTO
+            sessions (token, user_id, expires_at, created_at, updated_at)
+          VALUES
+            ($1, $2, $3, $4, $5)
+          RETURNING
+            *
+        ;`,
       values: [token, userId, expiresAt, new Date(), new Date()],
     });
 
@@ -66,12 +67,12 @@ async function renew(sessionId) {
   async function runInsertQuery(sessionId, expiresAt) {
     const results = await database.query({
       text: `
-        UPDATE 
+        UPDATE
           sessions
         SET
           expires_at = $1,
           updated_at = $2
-        WHERE 
+        WHERE
           id = $3
         RETURNING *
       ;`,
@@ -89,12 +90,12 @@ async function expireById(sessionId) {
   async function runUpdateQuery(sessionId) {
     const results = await database.query({
       text: `
-        UPDATE 
+        UPDATE
           sessions
-        SET 
-          expires_at = expires_at - interval '1 year', 
+        SET
+          expires_at = expires_at - interval '1 year',
           updated_at = $1
-        WHERE 
+        WHERE
           id = $2
         RETURNING *
     ;`,
