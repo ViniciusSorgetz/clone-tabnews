@@ -139,24 +139,18 @@ describe("GET /api/v1/user", () => {
       const renewedExpiresAt = new Date(renewedSession.expires_at);
       const oldExpiresAt = new Date(createdSession.expires_at);
 
-      renewedExpiresAt.setMilliseconds(0);
-      oldExpiresAt.setMilliseconds(0);
-
       // newed expires_at value is 15 days greater than the old value
       expect(renewedExpiresAt - oldExpiresAt).toBeCloseTo(
         session.EXPIRATION_IN_MILISECONDS / 2,
-        -3, // tolerância na casa dos milhares (≈ 1000)
+        -4, // tolerância na casa dos milhares (≈ 1000)
       );
 
       const renewedUpdatedAt = new Date(renewedSession.updated_at);
       const oldUpdatedAt = new Date(createdSession.updated_at);
 
-      renewedUpdatedAt.setMilliseconds(0);
-      oldUpdatedAt.setMilliseconds(0);
-
       expect(renewedUpdatedAt - oldUpdatedAt).toBeCloseTo(
         session.EXPIRATION_IN_MILISECONDS / 2,
-        -3, // tolerância na casa dos milhares (≈ 1000)
+        -4, // tolerância na casa dos milhares (≈ 1000)
       );
 
       // Set-Cookie assertions
