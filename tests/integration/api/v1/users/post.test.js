@@ -2,6 +2,7 @@ import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator.js";
 import user from "models/user";
 import password from "models/password";
+import activation from "models/activation";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -131,6 +132,55 @@ describe("POST /api/v1/users", () => {
         message: `O username littleRex já está sendo utilizado.`,
         action: "Utilize outro username para realizar esta operação.",
         status_code: 400,
+      });
+    });
+  });
+
+  describe("Default user", () => {
+    test("With unique and valid data", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "default-user",
+          email: "default-user@curso.dev",
+          password: "senha123",
+        }),
+      });
+
+      expect(response.status).toBe(201);
+      const responseBody = await response.json();
+
+      await activation.activateUserByUserId(responseBody.id);
+
+      const { token: sessionId } = await orchestrator.createSession(
+        responseBody.id,
+      );
+
+      const response2 = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          cookie: `session_id=${sessionId}`,
+        },
+        body: JSON.stringify({
+          username: "default-user2",
+          email: "default-user2@curso.dev",
+          password: "senha123",
+        }),
+      });
+
+      expect(response2.status).toBe(403);
+
+      const response2Body = await response2.json();
+
+      expect(response2Body).toEqual({
+        name: "ForbiddenError",
+        status_code: 403,
+        message: "Você não possui permissão para executar esta ação.",
+        action: "Verifique se o seu usuário possui a feature create:user.",
       });
     });
   });
