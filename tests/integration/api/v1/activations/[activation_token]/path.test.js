@@ -85,6 +85,7 @@ describe("PATCH /api/v1/activations", () => {
         "create:session",
         "read:user-information",
         "read:session",
+        "update:user",
       ]);
     });
 

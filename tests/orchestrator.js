@@ -70,6 +70,16 @@ async function createSession(userId) {
   return await session.create(userId);
 }
 
+async function getValidSession() {
+  const activatedUser = await createUser({
+    activated: true,
+  });
+
+  const sessionObject = await createSession(activatedUser.id);
+
+  return sessionObject.token;
+}
+
 async function deleteAllEmails() {
   await fetch(`${emailHttpUrl}/messages`, {
     method: "DELETE",
@@ -102,6 +112,7 @@ const orchestrator = {
   runPendingMigrations,
   createUser,
   createSession,
+  getValidSession,
   deleteAllEmails,
   getLastEmail,
 };

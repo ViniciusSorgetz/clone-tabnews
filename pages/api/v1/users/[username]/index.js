@@ -6,7 +6,7 @@ const router = createRouter();
 
 router.use(controller.injectAnonymousOrUser);
 router.get(controller.canRequest("read:user-information"), getHandler);
-router.patch(patchHandler);
+router.patch(controller.canRequest("update:user"), patchHandler);
 
 export default router.handler(controller.errorHandlers);
 
