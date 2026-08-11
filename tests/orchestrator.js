@@ -6,6 +6,7 @@ import migrator from "models/migrator.js";
 import user from "models/user.js";
 import session from "models/session";
 import activation from "models/activation";
+import authorization from "models/authorization";
 
 const emailHttpUrl = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -50,20 +51,30 @@ async function runPendingMigrations() {
   await migrator.runPendingMigrations();
 }
 
-async function createUser({ username, email, password, activated }) {
-  const createdUser = await user.create({
+async function createUser({
+  username,
+  email,
+  password,
+  activated,
+  addedFeatures,
+}) {
+  let createdUser;
+
+  createdUser = await user.create({
     username: username || faker.internet.username().replace(/[_.-]/g, ""),
     email: email || faker.internet.email(),
     password: password || "validpassword",
   });
 
-  if (!activated) {
-    return createdUser;
+  if (activated) {
+    createdUser = await activation.activateUserByUserId(createdUser.id);
   }
 
-  const activatedUser = await activation.activateUserByUserId(createdUser.id);
+  if (addedFeatures) {
+    createdUser = await user.addFeaturesByUserId(createdUser.id, addedFeatures);
+  }
 
-  return activatedUser;
+  return createdUser;
 }
 
 async function createSession(userId) {
